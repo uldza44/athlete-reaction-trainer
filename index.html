@@ -30,7 +30,7 @@
             padding: 30px 40px;
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            max-width: 450px;
+            max-width: 500px;
             width: 90%;
             text-align: center;
             position: relative;
@@ -51,10 +51,14 @@
 
         .controls {
             margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
         }
 
         .input-group {
-            margin-bottom: 20px;
+            width: 100%;
             text-align: left;
         }
 
@@ -151,6 +155,28 @@
             }
         }
 
+        /* Mute Button Styles */
+        .mute-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            color: #555555;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+
+        .mute-button:hover {
+            color: #007BFF;
+            transform: scale(1.2);
+        }
+
+        .mute-button:active {
+            transform: scale(1);
+        }
+
         /* Responsive Design */
         @media (max-width: 600px) {
             .trainer-container {
@@ -178,11 +204,20 @@
                 font-size: 16px;
                 padding: 10px 20px;
             }
+
+            .mute-button {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="trainer-container">
+        <!-- Mute Button -->
+        <button class="mute-button" id="muteBtn" aria-label="Mute Beeps">
+            🔊
+        </button>
+
         <h1 class="trainer-title">Athlete Reaction Trainer</h1>
         <div class="controls">
             <div class="input-group">
