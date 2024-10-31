@@ -1,346 +1,209 @@
-<!-- Athlete Reaction Trainer Web App -->
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
-<div class="trainer-container">
-    <h1 class="trainer-title">Athlete Reaction Trainer</h1>
-    <div class="controls">
-        <div class="input-group">
-            <label for="duration">Session Duration (seconds):</label>
-            <input type="number" id="duration" value="60" min="10" max="300">
-        </div>
-        <div class="input-group">
-            <label for="cooldown">Cooldown Duration (seconds):</label>
-            <input type="number" id="cooldown" value="3" min="1" max="10">
-        </div>
-        <button id="startBtn">Start Training</button>
-    </div>
-    <div class="timer" id="timer">00:00</div>
-    <div class="arrow-container" id="arrowContainer">
-        <!-- Arrow will be displayed here -->
-    </div>
-</div>
-
-<!-- Inline CSS for Styling and Responsiveness -->
-<style>
-    /* Base Styles */
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
-    body {
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-    }
-
-    .trainer-container {
-        background: #ffffff;
-        padding: 30px 40px;
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        max-width: 450px;
-        width: 90%;
-        text-align: center;
-        position: relative;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .trainer-container:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-    }
-
-    .trainer-title {
-        font-size: 32px;
-        margin-bottom: 25px;
-        color: #333333;
-        letter-spacing: 1px;
-    }
-
-    .controls {
-        margin-bottom: 25px;
-    }
-
-    .input-group {
-        margin-bottom: 20px;
-        text-align: left;
-    }
-
-    .input-group label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        color: #555555;
-    }
-
-    .input-group input[type="number"] {
-        width: 100%;
-        padding: 10px 15px;
-        font-size: 16px;
-        border: 2px solid #e0e0e0;
-        border-radius: 10px;
-        transition: border-color 0.3s ease;
-        outline: none;
-    }
-
-    .input-group input[type="number"]:focus {
-        border-color: #007BFF;
-        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-    }
-
-    #startBtn {
-        padding: 12px 25px;
-        font-size: 18px;
-        background: linear-gradient(135deg, #007BFF, #00C6FF);
-        color: #ffffff;
-        border: none;
-        border-radius: 25px;
-        cursor: pointer;
-        transition: background 0.3s ease, transform 0.2s ease;
-        box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
-        font-weight: 600;
-    }
-
-    #startBtn:hover {
-        background: linear-gradient(135deg, #0056b3, #0099e6);
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4);
-    }
-
-    #startBtn:active {
-        transform: translateY(1px);
-        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
-    }
-
-    .timer {
-        font-size: 48px;
-        margin-bottom: 25px;
-        color: #333333;
-        font-weight: 600;
-    }
-
-    .arrow-container {
-        position: relative;
-        width: 100%;
-        height: 200px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
-    }
-
-    .arrow {
-        font-size: 150px;
-        color: #007BFF;
-        opacity: 0;
-        transform: scale(0.8);
-        transition: opacity 0.5s ease, transform 0.5s ease;
-    }
-
-    .arrow.show {
-        opacity: 1;
-        transform: scale(1);
-        animation: pulse 1s infinite;
-    }
-
-    /* Pulse Animation for Arrows */
-    @keyframes pulse {
-        0% {
-            transform: scale(1);
-            opacity: 1;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athlete Reaction Trainer</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <!-- External CSS (Optional) -->
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <!-- Inline CSS for Styling and Responsiveness -->
+    <style>
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        50% {
-            transform: scale(1.05);
-            opacity: 0.8;
-        }
-        100% {
-            transform: scale(1);
-            opacity: 1;
-        }
-    }
 
-    /* Responsive Design */
-    @media (max-width: 600px) {
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
         .trainer-container {
-            padding: 20px 25px;
+            background: #ffffff;
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .trainer-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
         }
 
         .trainer-title {
-            font-size: 28px;
+            font-size: 32px;
+            margin-bottom: 25px;
+            color: #333333;
+            letter-spacing: 1px;
         }
 
-        .timer {
-            font-size: 36px;
+        .controls {
+            margin-bottom: 25px;
         }
 
-        .arrow {
-            font-size: 100px;
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555555;
         }
 
         .input-group input[type="number"] {
-            padding: 8px 12px;
-            font-size: 14px;
+            width: 100%;
+            padding: 10px 15px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: border-color 0.3s ease;
+            outline: none;
+        }
+
+        .input-group input[type="number"]:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
         }
 
         #startBtn {
-            font-size: 16px;
-            padding: 10px 20px;
+            padding: 12px 25px;
+            font-size: 18px;
+            background: linear-gradient(135deg, #007BFF, #00C6FF);
+            color: #ffffff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+            font-weight: 600;
         }
-    }
-</style>
 
-<!-- Inline JavaScript for Functionality -->
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const startBtn = document.getElementById('startBtn');
-        const durationInput = document.getElementById('duration');
-        const cooldownInput = document.getElementById('cooldown');
-        const timerDisplay = document.getElementById('timer');
-        const arrowContainer = document.getElementById('arrowContainer');
+        #startBtn:hover {
+            background: linear-gradient(135deg, #0056b3, #0099e6);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4);
+        }
 
-        let sessionDuration = 60; // default seconds
-        let cooldownDuration = 3; // default cooldown seconds
-        let remainingTime = 0;
-        let timerInterval;
-        let arrowTimeout;
-        let cooldown = false;
-        let countdownInterval;
-        let countdownNumber = 3;
+        #startBtn:active {
+            transform: translateY(1px);
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+        }
 
-        // Including diagonal directions
-        const directions = ['↑', '↓', '←', '→', '↖', '↗', '↙', '↘']; // Up, Down, Left, Right, Diagonals
+        .timer {
+            font-size: 48px;
+            margin-bottom: 25px;
+            color: #333333;
+            font-weight: 600;
+        }
 
-        startBtn.addEventListener('click', startTraining);
+        .arrow-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
 
-        function startTraining() {
-            // Reset any existing timers
-            clearInterval(timerInterval);
-            clearTimeout(arrowTimeout);
-            clearInterval(countdownInterval);
-            countdownNumber = 3;
+        .arrow {
+            font-size: 150px;
+            color: #007BFF;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
 
-            remainingTime = parseInt(durationInput.value, 10);
-            cooldownDuration = parseInt(cooldownInput.value, 10);
+        .arrow.show {
+            opacity: 1;
+            transform: scale(1);
+            animation: pulse 1s infinite;
+        }
 
-            if (isNaN(remainingTime) || remainingTime < 10) {
-                alert('Please enter a valid session duration (minimum 10 seconds).');
-                return;
+        /* Pulse Animation for Arrows */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
             }
-
-            if (isNaN(cooldownDuration) || cooldownDuration < 1) {
-                alert('Please enter a valid cooldown duration (minimum 1 second).');
-                return;
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
             }
-
-            timerDisplay.textContent = countdownNumber;
-            startBtn.disabled = true;
-            durationInput.disabled = true;
-            cooldownInput.disabled = true;
-
-            // Start Countdown
-            countdownInterval = setInterval(() => {
-                countdownNumber--;
-                if (countdownNumber > 0) {
-                    timerDisplay.textContent = countdownNumber;
-                } else if (countdownNumber === 0) {
-                    clearInterval(countdownInterval);
-                    timerDisplay.textContent = 'GO!';
-                    // Start the main training after a short delay to show "GO!"
-                    setTimeout(() => {
-                        timerDisplay.textContent = formatTime(remainingTime);
-                        startMainTraining();
-                    }, 500);
-                }
-            }, 1000);
-        }
-
-        function startMainTraining() {
-            // Start the countdown timer
-            timerInterval = setInterval(() => {
-                remainingTime--;
-                timerDisplay.textContent = formatTime(remainingTime);
-                if (remainingTime <= 0) {
-                    endTraining();
-                }
-            }, 1000);
-
-            triggerArrow();
-        }
-
-        function endTraining() {
-            clearInterval(timerInterval);
-            clearTimeout(arrowTimeout);
-            clearInterval(countdownInterval);
-            timerDisplay.textContent = "00:00";
-            arrowContainer.innerHTML = '';
-            // Re-enable controls
-            startBtn.disabled = false;
-            durationInput.disabled = false;
-            cooldownInput.disabled = false;
-            alert('Training session completed!');
-        }
-
-        function triggerArrow() {
-            if (remainingTime <= 0) return;
-
-            // Random delay between 0 to 2 seconds (0 to 2000 milliseconds)
-            const delay = getRandomInt(0, 2000);
-
-            arrowTimeout = setTimeout(() => {
-                if (cooldown) return;
-                showArrow();
-                cooldown = true;
-
-                // Arrow is shown for a longer duration (e.g., 2 seconds)
-                const arrowDisplayDuration = 2000; // 2 seconds
-                setTimeout(() => {
-                    hideArrow();
-                    // Start cooldown period
-                    setTimeout(() => {
-                        cooldown = false;
-                        triggerArrow(); // Schedule next arrow after cooldown
-                    }, cooldownDuration * 1000);
-                }, arrowDisplayDuration);
-
-            }, delay);
-        }
-
-        function showArrow() {
-            const arrow = document.createElement('div');
-            arrow.classList.add('arrow', 'show');
-            arrow.textContent = getRandomDirection();
-            arrowContainer.innerHTML = '';
-            arrowContainer.appendChild(arrow);
-        }
-
-        function hideArrow() {
-            const arrow = arrowContainer.querySelector('.arrow');
-            if (arrow) {
-                arrow.classList.remove('show');
-                setTimeout(() => {
-                    arrowContainer.innerHTML = '';
-                }, 500); // match CSS transition
+            100% {
+                transform: scale(1);
+                opacity: 1;
             }
         }
 
-        function getRandomDirection() {
-            const index = getRandomInt(0, directions.length - 1);
-            return directions[index];
-        }
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .trainer-container {
+                padding: 20px 25px;
+            }
 
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
+            .trainer-title {
+                font-size: 28px;
+            }
 
-        function formatTime(seconds) {
-            const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
-            const secs = String(seconds % 60).padStart(2, '0');
-            return `${mins}:${secs}`;
+            .timer {
+                font-size: 36px;
+            }
+
+            .arrow {
+                font-size: 100px;
+            }
+
+            .input-group input[type="number"] {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+
+            #startBtn {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
         }
-    </script>
+    </style>
+</head>
+<body>
+    <div class="trainer-container">
+        <h1 class="trainer-title">Athlete Reaction Trainer</h1>
+        <div class="controls">
+            <div class="input-group">
+                <label for="duration">Session Duration (seconds):</label>
+                <input type="number" id="duration" value="60" min="10" max="300">
+            </div>
+            <div class="input-group">
+                <label for="cooldown">Cooldown Duration (seconds):</label>
+                <input type="number" id="cooldown" value="3" min="1" max="10">
+            </div>
+            <button id="startBtn">Start Training</button>
+        </div>
+        <div class="timer" id="timer">00:00</div>
+        <div class="arrow-container" id="arrowContainer">
+            <!-- Arrow will be displayed here -->
+        </div>
+    </div>
+
+    <!-- External JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
