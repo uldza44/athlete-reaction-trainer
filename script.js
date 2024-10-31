@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const stopBtn = document.getElementById('stopBtn');
     const durationInput = document.getElementById('duration');
     const cooldownInput = document.getElementById('cooldown');
     const timerDisplay = document.getElementById('timer');
@@ -15,15 +17,23 @@ document.addEventListener('DOMContentLoaded', () => {
     let countdownInterval;
     let countdownNumber = 3;
     let isMuted = false;
+    let isPaused = false;
 
     // Including diagonal directions
     const directions = ['↑', '↓', '←', '→', '↖', '↗', '↙', '↘']; // Up, Down, Left, Right, Diagonals
 
     // Web Audio API setup
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let audioCtx = null;
+
+    function initAudioContext() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
 
     function playBeep(frequency = 440, duration = 200) {
         if (isMuted) return;
+        if (!audioCtx) return;
 
         const oscillator = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
@@ -48,12 +58,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mute Button Event Listener
     muteBtn.addEventListener('click', toggleMute);
 
+    // Pause Button Event Listener
+    pauseBtn.addEventListener('click', togglePause);
+
+    // Stop Button Event Listener
+    stopBtn.addEventListener('click', stopTraining);
+
     function startTraining() {
+        // Initialize AudioContext on user interaction
+        initAudioContext();
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
         // Reset any existing timers
         clearInterval(timerInterval);
         clearTimeout(arrowTimeout);
         clearInterval(countdownInterval);
         countdownNumber = 3;
+        isPaused = false;
 
         remainingTime = parseInt(durationInput.value, 10);
         cooldownDuration = parseInt(cooldownInput.value, 10);
@@ -69,14 +92,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         timerDisplay.textContent = countdownNumber;
-        startBtn.disabled = true;
-        durationInput.disabled = true;
-        cooldownInput.disabled = true;
+        startBtn.style.display = 'none';
+        pauseBtn.style.display = 'inline-block';
+        stopBtn.style.display = 'inline-block';
+        pauseBtn.textContent = 'Pause';
 
         playBeep(1000, 500); // Beep for countdown start
 
         // Start Countdown
         countdownInterval = setInterval(() => {
+            if (isPaused) return;
             countdownNumber--;
             if (countdownNumber > 0) {
                 timerDisplay.textContent = countdownNumber;
@@ -97,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function startMainTraining() {
         // Start the countdown timer
         timerInterval = setInterval(() => {
+            if (isPaused) return;
             remainingTime--;
             timerDisplay.textContent = formatTime(remainingTime);
             if (remainingTime <= 0) {
@@ -114,21 +140,22 @@ document.addEventListener('DOMContentLoaded', () => {
         timerDisplay.textContent = "00:00";
         arrowContainer.innerHTML = '';
         playBeep(600, 500); // Beep when training ends
+
         // Re-enable controls
-        startBtn.disabled = false;
-        durationInput.disabled = false;
-        cooldownInput.disabled = false;
+        startBtn.style.display = 'inline-block';
+        pauseBtn.style.display = 'none';
+        stopBtn.style.display = 'none';
         alert('Training session completed!');
     }
 
     function triggerArrow() {
-        if (remainingTime <= 0) return;
+        if (remainingTime <= 0 || isPaused) return;
 
         // Random delay between 0 to 2 seconds (0 to 2000 milliseconds)
         const delay = getRandomInt(0, 2000);
 
         arrowTimeout = setTimeout(() => {
-            if (cooldown) return;
+            if (cooldown || isPaused) return;
             showArrow();
             cooldown = true;
 
@@ -186,5 +213,36 @@ document.addEventListener('DOMContentLoaded', () => {
         isMuted = !isMuted;
         muteBtn.textContent = isMuted ? '🔇' : '🔊';
         muteBtn.setAttribute('aria-label', isMuted ? 'Unmute Beeps' : 'Mute Beeps');
+    }
+
+    function togglePause() {
+        if (!isPaused) {
+            isPaused = true;
+            pauseBtn.textContent = 'Resume';
+            playBeep(700, 300); // Beep when paused
+        } else {
+            isPaused = false;
+            pauseBtn.textContent = 'Pause';
+            playBeep(700, 300); // Beep when resumed
+            // Resume the arrow triggering if not in cooldown
+            if (!cooldown && remainingTime > 0) {
+                triggerArrow();
+            }
+        }
+    }
+
+    function stopTraining() {
+        clearInterval(timerInterval);
+        clearTimeout(arrowTimeout);
+        clearInterval(countdownInterval);
+        timerDisplay.textContent = "00:00";
+        arrowContainer.innerHTML = '';
+        playBeep(600, 500); // Beep when training stops
+
+        // Re-enable controls
+        startBtn.style.display = 'inline-block';
+        pauseBtn.style.display = 'none';
+        stopBtn.style.display = 'none';
+        alert('Training session stopped.');
     }
 });
