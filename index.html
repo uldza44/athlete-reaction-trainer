@@ -84,7 +84,7 @@
             box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
         }
 
-        #startBtn {
+        #startBtn, #pauseBtn, #stopBtn {
             padding: 12px 25px;
             font-size: 18px;
             background: linear-gradient(135deg, #007BFF, #00C6FF);
@@ -95,15 +95,16 @@
             transition: background 0.3s ease, transform 0.2s ease;
             box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
             font-weight: 600;
+            margin: 5px;
         }
 
-        #startBtn:hover {
+        #startBtn:hover, #pauseBtn:hover, #stopBtn:hover {
             background: linear-gradient(135deg, #0056b3, #0099e6);
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4);
         }
 
-        #startBtn:active {
+        #startBtn:active, #pauseBtn:active, #stopBtn:active {
             transform: translateY(1px);
             box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
         }
@@ -200,7 +201,7 @@
                 font-size: 14px;
             }
 
-            #startBtn {
+            #startBtn, #pauseBtn, #stopBtn {
                 font-size: 16px;
                 padding: 10px 20px;
             }
@@ -228,7 +229,11 @@
                 <label for="cooldown">Cooldown Duration (seconds):</label>
                 <input type="number" id="cooldown" value="3" min="1" max="10">
             </div>
+            <!-- Start Button (visible by default) -->
             <button id="startBtn">Start Training</button>
+            <!-- Pause and Stop Buttons (hidden by default) -->
+            <button id="pauseBtn" style="display: none;">Pause</button>
+            <button id="stopBtn" style="display: none;">Stop</button>
         </div>
         <div class="timer" id="timer">00:00</div>
         <div class="arrow-container" id="arrowContainer">
@@ -240,3 +245,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
