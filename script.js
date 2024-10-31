@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cooldownInput = document.getElementById('cooldown');
     const timerDisplay = document.getElementById('timer');
     const arrowContainer = document.getElementById('arrowContainer');
+    const muteBtn = document.getElementById('muteBtn');
 
     let sessionDuration = 60; // default seconds
     let cooldownDuration = 3; // default cooldown seconds
@@ -13,11 +14,39 @@ document.addEventListener('DOMContentLoaded', () => {
     let cooldown = false;
     let countdownInterval;
     let countdownNumber = 3;
+    let isMuted = false;
 
     // Including diagonal directions
     const directions = ['↑', '↓', '←', '→', '↖', '↗', '↙', '↘']; // Up, Down, Left, Right, Diagonals
 
+    // Web Audio API setup
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playBeep(frequency = 440, duration = 200) {
+        if (isMuted) return;
+
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        oscillator.type = 'sine';
+        oscillator.frequency.value = frequency; // frequency in Hz
+
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + duration / 1000);
+
+        // Optional: Fade out to prevent clicks
+        gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration / 1000);
+    }
+
+    // Start Training Button Event Listener
     startBtn.addEventListener('click', startTraining);
+
+    // Mute Button Event Listener
+    muteBtn.addEventListener('click', toggleMute);
 
     function startTraining() {
         // Reset any existing timers
@@ -44,14 +73,18 @@ document.addEventListener('DOMContentLoaded', () => {
         durationInput.disabled = true;
         cooldownInput.disabled = true;
 
+        playBeep(1000, 500); // Beep for countdown start
+
         // Start Countdown
         countdownInterval = setInterval(() => {
             countdownNumber--;
             if (countdownNumber > 0) {
                 timerDisplay.textContent = countdownNumber;
+                playBeep(800, 300); // Beep during countdown
             } else if (countdownNumber === 0) {
                 clearInterval(countdownInterval);
                 timerDisplay.textContent = 'GO!';
+                playBeep(1200, 500); // Beep when GO!
                 // Start the main training after a short delay to show "GO!"
                 setTimeout(() => {
                     timerDisplay.textContent = formatTime(remainingTime);
@@ -80,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(countdownInterval);
         timerDisplay.textContent = "00:00";
         arrowContainer.innerHTML = '';
+        playBeep(600, 500); // Beep when training ends
         // Re-enable controls
         startBtn.disabled = false;
         durationInput.disabled = false;
@@ -97,6 +131,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (cooldown) return;
             showArrow();
             cooldown = true;
+
+            // Play beep when arrow appears
+            playBeep(900, 300);
 
             // Arrow is shown for a longer duration (e.g., 2 seconds)
             const arrowDisplayDuration = 2000; // 2 seconds
@@ -143,5 +180,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
         const secs = String(seconds % 60).padStart(2, '0');
         return `${mins}:${secs}`;
+    }
+
+    function toggleMute() {
+        isMuted = !isMuted;
+        muteBtn.textContent = isMuted ? '🔇' : '🔊';
+        muteBtn.setAttribute('aria-label', isMuted ? 'Unmute Beeps' : 'Mute Beeps');
     }
 });
